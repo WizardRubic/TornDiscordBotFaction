@@ -2,6 +2,18 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 var auth = require('./auth.json');
 var sqlite3 = require('sqlite3');
+<<<<<<< Updated upstream
+
+let db = new sqlite3.Database('./db/faction.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Connected to the faction database.');
+});
+
+var pingPonger = require('./pingponger.js').PingPonger();
+var tornAccountHandler = require('./TornAccountHandling.js').TornAccountHandling(db);
+=======
 
 let db = new sqlite3.Database('./db/faction.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
@@ -21,6 +33,7 @@ var pingPonger = require('./pingponger.js').PingPonger();
 var tornAccountHandler = require('./TornAccountHandling.js').TornAccountHandling(db, client);
 var helpHandler = require('./HelpHandling.js').HelpHandling();
 var lotteryHandler = require('./LotteryHandling.js').LotteryHandling(db, client);
+>>>>>>> Stashed changes
 
 client.on('ready', () => {
   console.log("ready!");
@@ -28,6 +41,15 @@ client.on('ready', () => {
 
 // since we strip the commands of casing, these commands should all be lower case
 var commandMapping = {
+<<<<<<< Updated upstream
+  "!ping" : pingPonger.handler,
+  "!profile" : tornAccountHandler.profileHandler,
+  "!link": tornAccountHandler.linkHandler,
+  "!unlink": tornAccountHandler.unlinkHandler
+};
+
+client.on('message', msg => {
+=======
   "!help" : helpHandler.helpHandler,
   "!ping" : pingPonger.handler,
   "!profile" : tornAccountHandler.profileHandler,
@@ -41,6 +63,7 @@ var commandMapping = {
 
 client.on('message', msg => {
   if(msg.author.bot) return;
+>>>>>>> Stashed changes
   var args = msg.toString().split(" ");
   if (args==undefined) {
     return;
