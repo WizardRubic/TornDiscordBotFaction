@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-var auth = require('./auth.json');
+var auth = require('./../auth.json');
 var sqlite3 = require('sqlite3');
 
 let db = new sqlite3.Database('./db/faction.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -55,7 +55,6 @@ client.on('message', msg => {
 });
 
 client.login(auth.token);
-
 
 
 
