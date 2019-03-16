@@ -49,12 +49,16 @@ exports.LotteryHandling = function(db, client) {
             msg.reply('No lottery is occurring at the moment.');
             return;
         }
+        if(!(msg.member.hasPermissions('Faction Leaders') || msg.author == currentOwnerMsg)) {
+            msg.reply('You must either be a Faction Leader or have started the lottery to end it!');
+            return
+        }
         if(Object.keys(currentEntrants).length == 0) {
             msg.reply(`Lottery ended without entrants`);
         } else {
             var keys = Object.keys(currentEntrants);
             var winningMsg = currentEntrants[keys[generateRandomNumber(keys.length)]];
-            tornAccountHandler.checkIfLinked(winningMsg.author.id, endLotteryCallback, [winningMsg, msg, currentReward]);
+            tornAccountHandler.checkIfLinked(winningMsg.author.id, endLotteryCallback, [winningMsg, msg, currentReward, currentOwnerMsg.author]);
         }
         isLotteryOccurring = false;
         currentAmountOfEntrants = 0;
@@ -81,12 +85,13 @@ exports.LotteryHandling = function(db, client) {
         var winningMsg = args[0];
         var msg = args[1];
         var reward = args[2];
+        var lotteryOwner = args[3];
         if(isLinked) {
             var tornID = rows.TornID;
             link = `, https://www.torn.com/profiles.php?XID=${tornID}`;
-            msg.reply(`Lottery ended for ${reward}, Winner: ${winningMsg.author}` + link);
+            msg.reply(`Lottery ended for ${reward} from ${lotteryOwner}, Winner: ${winningMsg.author}` + link);
         } else {
-            msg.reply(`Lottery ended for ${reward}, Winner: ${winningMsg.author}`);
+            msg.reply(`Lottery ended for ${reward} from ${lotteryOwner}, Winner: ${winningMsg.author}`);
         }
     }
 }
