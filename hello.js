@@ -11,7 +11,7 @@ var db = new loki('./db/faction2.json', {
   autoload: true,
   autoloadCallback : lokiInit,
   autosave: true,
-  autosaveInterval: 500
+  autosaveInterval: 8000
 });
 
 // db.loadDatabase({}, function(err) {
