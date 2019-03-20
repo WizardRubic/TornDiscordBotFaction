@@ -1,32 +1,63 @@
+// required third party files
 const Discord = require('discord.js');
 const client = new Discord.Client();
 var auth = require('./../auth.json');
-var sqlite3 = require('sqlite3');
+// var sqlite3 = require('sqlite3');
+var loki = require('lokijs');
 
-let db = new sqlite3.Database('./db/faction.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-  if (err) {
-    console.error(err.message);
-  }
-  console.log('Connected to the faction database.');
 
+// Make a loki database!
+var db = new loki('./db/faction2.json', {
+  autoload: true,
+  autoloadCallback : lokiInit,
+  autosave: true,
+  autosaveInterval: 500
 });
 
-var createQuery = `CREATE TABLE IF NOT EXISTS DiscordToTorn (
-  DiscordID TEXT,
-  TornID INTEGER
-)`
-db.run(createQuery);
+// db.loadDatabase({}, function(err) {
+//   if(err) {
+//     console.error("error: " + err);
+//   } else {
+//     if(db.getCollection('DiscordToTorn')) {
+//       db.addCollection('DiscordToTorn');
+//     }
+//     client.login(auth.token);
+//     console.log("db ready!");
+//   }
+// });
+
+function lokiInit() {
+  if(db.getCollection('DiscordToTorn') == null) {
+    db.addCollection('DiscordToTorn');
+  }
+  client.login(auth.token);
+  console.log("db ready!");
+}
+
+
+
+// let db = new sqlite3.Database('./db/faction.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+//   if (err) {
+//     console.error(err.message);
+//   }
+//   console.log('Connected to the faction database.');
+
+// });
+
+// var createQuery = `CREATE TABLE IF NOT EXISTS DiscordToTorn (
+//   DiscordID TEXT,
+//   TornID INTEGER
+// )`
+// db.run(createQuery);
+// client.login(auth.token);
+
 
 var pingPonger = require('./pingponger.js').PingPonger();
 var tornAccountHandler = require('./TornAccountHandling.js').TornAccountHandling(db, client);
 var helpHandler = require('./HelpHandling.js').HelpHandling();
 var lotteryHandler = require('./LotteryHandling.js').LotteryHandling(db, client);
 
-client.on('ready', () => {
-  console.log("ready!");
-});
-
-// since we strip the commands of casing, these commands should all be lower case
+// Mapping of commands!
 var commandMapping = {
   "!help" : helpHandler.helpHandler,
   "!ping" : pingPonger.handler,
@@ -38,6 +69,13 @@ var commandMapping = {
   "!enter": lotteryHandler.enterHandler,
   "!displaylinked": tornAccountHandler.displayAllHandler
 };
+
+
+client.on('ready', () => {
+  console.log("ready!");
+});
+
+
 
 client.on('message', msg => {
   if(msg.author.bot) return;
@@ -54,7 +92,6 @@ client.on('message', msg => {
   mappedCommand(msg, args);
 });
 
-client.login(auth.token);
 
 
 
