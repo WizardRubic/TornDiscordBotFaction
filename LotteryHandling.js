@@ -49,9 +49,9 @@ exports.LotteryHandling = function(db, client) {
             msg.reply('No lottery is occurring at the moment.');
             return;
         }
-        if(!(msg.member.hasPermissions('Faction Leaders') || msg.author == currentOwnerMsg)) {
+        if(msg.author!=currentOwnerMsg.author && !hasLotteryControl(msg)) {
             msg.reply('You must either be a Faction Leader or have started the lottery to end it!');
-            return
+            return;
         }
         if(Object.keys(currentEntrants).length == 0) {
             msg.reply(`Lottery ended without entrants`);
@@ -68,7 +68,19 @@ exports.LotteryHandling = function(db, client) {
     }
     return objectToReturn;
 
-    
+    function hasLotteryControl(msg) {
+        var roles = msg.member.roles;
+        var lotteryControl = false;
+        roles.forEach(function(key){
+            console.log(`|${key.name}|`);
+            var newStr = key.name.replace(/(^\s+|\s+$)/g,'');
+            if(newStr == 'Faction Leaders') {
+                lotteryControl = true;
+                return;
+            }
+        });
+        return lotteryControl;
+    }
     function generateRandomNumber(rangeEnd) {
         return Math.floor(Math.random() * rangeEnd);
     }
