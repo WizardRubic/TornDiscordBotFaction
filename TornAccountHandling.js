@@ -47,28 +47,27 @@ exports.TornAccountHandling = function(db, client) {
     var objectToReturn = {};
 
     objectToReturn.checkIfLinked = function(discordID, callback, args) {
-    	console.log("in checkiflinked");
         var rows = db.getCollection('DiscordToTorn').findOne({'DiscordID' : discordID});
         callback(args, rows!=undefined, rows);
     }
 
     objectToReturn.linkHandler = function(msg, args) {
     	if(args[1] == undefined) {
-    		msg.reply('TornID parameter missing');
+    		msg.reply('TornID parameter missing, example if your id was 123: !link 123');
     		return;
     	}
     	var inputSanitizerRegex = RegExp(/^[0-9]*$/g);
     	if(!(inputSanitizerRegex.test(args[1]))){
-    		msg.reply('Invalid input');
+    		msg.reply('Invalid input, example if your id was 123: !link 123');
     		return;
     	}
 
-        var rows = db.getCollection('DiscordToTorn').findOne({'DiscordID' : msg.author.id});
-        if(rows == undefined) {
-            insertTornID(msg, args);
-        } else {
-            msg.reply("Your account is already linked to: " + rows.TornID);
-        }
+      var rows = db.getCollection('DiscordToTorn').findOne({'DiscordID' : msg.author.id});
+      if(rows == undefined) {
+          insertTornID(msg, args);
+      } else {
+          msg.reply(`Your account is already linked to: ${rows.TornID}, to change this call !unlink` );
+      }
     }
     /**
      * unlink handler
@@ -81,7 +80,7 @@ exports.TornAccountHandling = function(db, client) {
         if(rows != undefined) {
             removeTornID(msg, rows);
         } else {
-            msg.reply("Your account wasn't linked before running !unlink");
+            msg.reply("Your account wasn't linked with !link before running !unlink");
         }
     }
     
@@ -112,12 +111,11 @@ exports.TornAccountHandling = function(db, client) {
         if(rows != undefined) {
             rows.forEach((row) => {
                 if(client.users.has('' + row.DiscordID)) {
-                    message+=client.users.get(`${row.DiscordID}`) + 
+                    message+='        ' + client.users.get(`${row.DiscordID}`) + 
                     `, TornID: [${row.TornID}](https://www.torn.com/profiles.php?XID=${row.TornID})`+ '\n';
                 }
             });
-            msg.reply(`**All Linked Users:**
-            ${message}`);
+            msg.reply(`**All Linked Users:**` + '\n' + `${message}`);
         } else {
             msg.reply(`No accounts have been linked yet.`);
         }
