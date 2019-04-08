@@ -30,8 +30,12 @@ function lokiInit() {
   if(db.getCollection('DiscordToTorn') == null) {
     db.addCollection('DiscordToTorn');
   }
+  if(db.getCollection('LotteryValues') == null) {
+    db.addCollection('LotteryValues');
+  }
   client.login(auth.token);
   console.log("db ready!");
+  initLogic();
 }
 
 
@@ -52,45 +56,50 @@ function lokiInit() {
 // client.login(auth.token);
 
 
-var pingPonger = require('./pingponger.js').PingPonger();
-var tornAccountHandler = require('./TornAccountHandling.js').TornAccountHandling(db, client);
-var helpHandler = require('./HelpHandling.js').HelpHandling();
-var lotteryHandler = require('./LotteryHandling.js').LotteryHandling(db, client);
+function initLogic() {
+  var pingPonger = require('./pingponger.js').PingPonger();
+  var tornAccountHandler = require('./TornAccountHandling.js').TornAccountHandling(db, client);
+  var helpHandler = require('./HelpHandling.js').HelpHandling();
+  var lotteryHandler = require('./LotteryHandling.js').LotteryHandling(db, client);
 
-// Mapping of commands!
-var commandMapping = {
-  "!help" : helpHandler.helpHandler,
-  "!ping" : pingPonger.handler,
-  "!profile" : tornAccountHandler.profileHandler,
-  "!link": tornAccountHandler.linkHandler,
-  "!unlink": tornAccountHandler.unlinkHandler,
-  "!lotterystart": lotteryHandler.startLotteryHandler,
-  "!lotteryend": lotteryHandler.endLotteryHandler,
-  "!enter": lotteryHandler.enterHandler,
-  "!displaylinked": tornAccountHandler.displayAllHandler
-};
-
-
-client.on('ready', () => {
-  console.log("ready!");
-});
+  // Mapping of commands!
+  var commandMapping = {
+    "!help" : helpHandler.helpHandler,
+    "!ping" : pingPonger.handler,
+    "!profile" : tornAccountHandler.profileHandler,
+    "!link": tornAccountHandler.linkHandler,
+    "!unlink": tornAccountHandler.unlinkHandler,
+    "!lotterystart": lotteryHandler.startLotteryHandler,
+    "!lotteryend": lotteryHandler.endLotteryHandler,
+    "!enter": lotteryHandler.enterHandler,
+    "!displaylinked": tornAccountHandler.displayAllHandler
+  };
 
 
+  client.on('ready', () => {
+    console.log("ready!");
+  });
 
-client.on('message', msg => {
-  if(msg.author.bot) return;
-  var args = msg.toString().split(" ");
-  if (args==undefined) {
-    return;
-  }
-  console.log(args);
-  var lowerCasedCommand = args[0].toLowerCase();
-  var mappedCommand = commandMapping[lowerCasedCommand];
-  if(mappedCommand == undefined) {
-    return;
-  }
-  mappedCommand(msg, args);
-});
+
+
+  client.on('message', msg => {
+    if(msg.author.bot) return;
+    var args = msg.toString().split(" ");
+    if (args==undefined) {
+      return;
+    }
+    console.log(args);
+    var lowerCasedCommand = args[0].toLowerCase();
+    var mappedCommand = commandMapping[lowerCasedCommand];
+    if(mappedCommand == undefined) {
+      return;
+    }
+    mappedCommand(msg, args);
+  });
+}
+
+
+
 
 
 
