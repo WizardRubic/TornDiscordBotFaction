@@ -47,7 +47,6 @@ exports.LotteryHandling = function(db, client, persist = true) {
 
             // increment the amount of users entered
             dbIncrementCurrentAmountOfEntrants(msg);
-            console.log("dbGetCurrentReward(): " + dbGetCurrentReward() + ", dbGetCurrentAmountOfEntrants(msg): " + dbGetCurrentAmountOfEntrants(msg));
             tornAccountHandler.checkIfLinked(msg.author.id, enterLotteryCallback, [dbGetCurrentReward(), dbGetCurrentAmountOfEntrants(msg), msg]); 
         } else {
             if(!isLotteryOccurring) {
@@ -111,10 +110,6 @@ exports.LotteryHandling = function(db, client, persist = true) {
                 msg.reply('No lottery is occurring at the moment.');
                 return;
             }
-            // console.log('+++++++++++');
-            // console.log(msg.author.id);
-            // console.log(dbGetCurrentOwner());
-            // console.log('+++++++++++');
             if(msg.author.id!=dbGetCurrentOwner('id') && !hasLotteryControl(msg)) {
                 msg.reply('You must either be a Faction Leader or have started the lottery to end it!');
                 return;
@@ -125,7 +120,6 @@ exports.LotteryHandling = function(db, client, persist = true) {
             } else {
                 var keys = Object.keys(entrants);
                 var winningID = entrants[keys[generateRandomNumber(keys.length)]];
-                // console.log("");
                 tornAccountHandler.checkIfLinked(winningID, endLotteryCallbackDB, [winningID, msg, dbGetCurrentReward(), dbGetCurrentOwner('name')]);
             }
             dbSetIsLotteryOccurring(false);
@@ -161,8 +155,6 @@ exports.LotteryHandling = function(db, client, persist = true) {
 
     function dbGetCurrentOwner(idOrName) {
         var rows = db.getCollection('LotteryValues').findOne({'key' : 'currentOwner'});
-        console.log("rows.value");
-        console.log(rows.value);
         if(rows == undefined) {
             msg.reply(`Database error!`);
             return;
@@ -203,9 +195,7 @@ exports.LotteryHandling = function(db, client, persist = true) {
         if(rows == undefined) {
             msg.reply(`Database error!`);
             return;
-        } 
-        console.log("000000000");
-        console.log(rows.value);
+        }
         return rows.value;
     } 
 
@@ -279,7 +269,6 @@ exports.LotteryHandling = function(db, client, persist = true) {
         var roles = msg.member.roles;
         var lotteryControl = false;
         roles.forEach(function(key){
-            console.log(`|${key.name}|`);
             var newStr = key.name.replace(/(^\s+|\s+$)/g,'');
             if(newStr == 'Faction Leaders') {
                 lotteryControl = true;
