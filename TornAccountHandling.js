@@ -9,9 +9,6 @@ exports.TornAccountHandling = function(db, client) {
 	 */
 	var insertTornID = function(msg, args) {
 		var rows = db.getCollection('DiscordToTorn').insert({DiscordID: msg.author.id, TornID: args[1]});
-        // var insertQuery = `INSERT INTO DiscordToTorn(DiscordID, TornID)
-		// VALUES(${msg.author.id}, ${args[1]})`;
-		// db.run(insertQuery);
 		msg.reply(`Linked ${msg.author.username} to TornID: ${args[1]}`);
 	};
 
@@ -22,9 +19,7 @@ exports.TornAccountHandling = function(db, client) {
 	 * @return {undefined}          
 	 */
 	var removeTornID = function(msg, tableRow) {
-        var rows = db.getCollection('DiscordToTorn').findAndRemove({'DiscordID' : msg.author.id});
-		// var removeQuery = `DELETE FROM DiscordToTorn WHERE DiscordID = '${msg.author.id}'`;
-		// db.run(removeQuery);
+    var rows = db.getCollection('DiscordToTorn').findAndRemove({'DiscordID' : msg.author.id});
 		msg.reply(`Unlinked ${msg.author.username} from TornID: ${tableRow.TornID}`);
 	};
 
@@ -35,17 +30,6 @@ exports.TornAccountHandling = function(db, client) {
         } else {
             msg.reply(`${entry} wasn't linked and could not be found before !profile`);
         }
-        // var checkQuery = `SELECT DiscordID, TornID FROM DiscordToTorn where DiscordID = '${discordID}'`;
-  //       db.get(
-  //   		checkQuery,
-  //   		function(err, rows) {
-  //   			if(err || rows != undefined) {
-  //   				msg.reply(`https://www.torn.com/profiles.php?XID=${rows.TornID}`);
-  //   			} else {
-  //   				msg.reply(`${entry} wasn't linked and could not be found before !profile`);
-  //   			}
-  //   		}
-		// );
 	}
 
 	
@@ -61,36 +45,11 @@ exports.TornAccountHandling = function(db, client) {
 	}
 
     var objectToReturn = {};
-	
-	// objectToReturn.getTornID = function (DiscordID) {
-	// 	var checkQuery = `SELECT DiscordID, TornID FROM DiscordToTorn where DiscordID = '${DiscordID}'`;
- //        db.get(
- //    		checkQuery,
- //    		function(err, rows) {
- //    			if(err || rows != undefined) {
- //    				return rows.TornID;
- //    			} else {
- //    				return undefined;
- //    			}
- //    		}
-	// 	);
-	// }
 
     objectToReturn.checkIfLinked = function(discordID, callback, args) {
     	console.log("in checkiflinked");
-    	// var checkQuery = `SELECT DiscordID, TornID FROM DiscordToTorn where DiscordID = '${discordID}'`;
         var rows = db.getCollection('DiscordToTorn').findOne({'DiscordID' : discordID});
         callback(args, rows!=undefined, rows);
-
-  //       db.get(
-  //   		checkQuery,
-  //   		function(err, rows) {
-  //   			if(err) {
-  //   				callback(args, false, rows);
-  //   			}
-		// 		callback(args, rows!=undefined, rows);
-  //   		}
-		// );
     }
 
     objectToReturn.linkHandler = function(msg, args) {
@@ -110,19 +69,6 @@ exports.TornAccountHandling = function(db, client) {
         } else {
             msg.reply("Your account is already linked to: " + rows.TornID);
         }
-
-    	// var checkQuery = `SELECT DiscordID, TornID FROM DiscordToTorn where DiscordID = '${msg.author.id}'`;
-    	// db.get(
-    	// 	checkQuery,
-    	// 	function(err, rows) {
-    	// 		if(err || rows == undefined) {
-    	// 			insertTornID(msg, args);
-    	// 		} else {
-    	// 			msg.reply("Your account is already linked to: " + rows.TornID);
-    	// 		}
-    	// 	}
-    	// 	);
-    	
     }
     /**
      * unlink handler
@@ -137,19 +83,6 @@ exports.TornAccountHandling = function(db, client) {
         } else {
             msg.reply("Your account wasn't linked before running !unlink");
         }
-
-     //    // remove the sqlite entry from the db if it exists.
-     //    var checkQuery = `SELECT DiscordID, TornID FROM DiscordToTorn where DiscordID = '${msg.author.id}'`;
-    	// db.get(
-    	// 	checkQuery,
-    	// 	function(err, rows) {
-    	// 		if(err || rows != undefined) {
-    	// 			removeTornID(msg, rows);
-    	// 		} else {
-    	// 			msg.reply("Your account wasn't linked before running !unlink");
-    	// 		}
-    	// 	}
-    	// 	);
     }
     
     objectToReturn.profileHandler = function(msg, args) {
@@ -188,26 +121,6 @@ exports.TornAccountHandling = function(db, client) {
         } else {
             msg.reply(`No accounts have been linked yet.`);
         }
-
-  //   	var queryAllUsers = `SELECT DiscordID, TornID FROM DiscordToTorn`
-  //   	var message = "";
-  //       db.all(
-  //   		queryAllUsers,
-  //   		function(err, rows) {
-  //   			if(err || rows != undefined) {
-  //   				rows.forEach((row) => {
-  //   					if(client.users.has('' + row.DiscordID)) {
-  //   						message+=client.users.get(`${row.DiscordID}`) + 
-  //   						`, TornID: [${row.TornID}](https://www.torn.com/profiles.php?XID=${row.TornID})`+ '\n';
-  //   					}
-  //   				});
-  //   				msg.reply(`**All Linked Users:**
-  //   					${message}`);
-  //   			} else {
-  //   				msg.reply(`No accounts have been linked yet.`);
-  //   			}
-  //   		}
-		// );
     }
     return objectToReturn;
 }
